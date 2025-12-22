@@ -10,16 +10,21 @@ export async function getTasksByYear(year) {
 
   const tasks = {};
   data.forEach(task => {
-    const key = task.date;
-    if (!tasks[key]) tasks[key] = [];
-    tasks[key].push(task);
+    if (!tasks[task.date]) tasks[task.date] = [];
+    tasks[task.date].push(task);
   });
 
   return tasks;
 }
 
 export async function addTask(task) {
-  const { error } = await supabase.from("tasks").insert(task);
+  const user = (await supabase.auth.getUser()).data.user;
+
+  const { error } = await supabase.from("tasks").insert({
+    ...task,
+    user_id: user.id
+  });
+
   if (error) throw error;
 }
 
@@ -28,6 +33,7 @@ export async function toggleTask(id, done) {
     .from("tasks")
     .update({ done })
     .eq("id", id);
+
   if (error) throw error;
 }
 
@@ -36,6 +42,7 @@ export async function updateTask(id, text) {
     .from("tasks")
     .update({ text })
     .eq("id", id);
+
   if (error) throw error;
 }
 
@@ -44,5 +51,6 @@ export async function deleteTask(id) {
     .from("tasks")
     .delete()
     .eq("id", id);
+
   if (error) throw error;
 }

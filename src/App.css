@@ -107,3 +107,22 @@
   gap: 6px;
   margin-bottom: 4px;
 }
+
+.top-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.logout-btn {
+  padding: 6px 10px;
+  background: #7f1d1d;
+  color: #fef2f2;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.logout-btn:hover {
+  background: #991b1b;
+}
