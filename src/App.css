@@ -1,0 +1,109 @@
+.app-layout {
+  display: flex;
+  gap: 24px;
+  padding: 20px;
+  font-family: system-ui, sans-serif;
+}
+
+/* ===== YEAR SELECTOR ===== */
+.year-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.year-selector button {
+  padding: 6px 10px;
+  border: none;
+  cursor: pointer;
+  background: #0f172a;
+  color: #e5e7eb;
+}
+
+.year-selector .active {
+  background: #2563eb;
+}
+
+/* ===== CALENDAR ===== */
+.calendar-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.month-row {
+  display: grid;
+  grid-template-columns: repeat(53, 14px);
+  margin-left: 36px;
+  height: 18px;
+}
+
+.month-label {
+  font-size: 10px;
+  color: #9ca3af;
+  text-align: left;
+}
+
+.calendar-grid {
+  display: flex;
+}
+
+.week-labels {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 10px;
+  margin-right: 6px;
+  color: #9ca3af;
+}
+
+.year-grid {
+  display: grid;
+  grid-template-columns: repeat(53, 14px);
+  grid-template-rows: repeat(7, 14px);
+  gap: 3px;
+}
+
+/* ===== DAY CELL ===== */
+.day {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.day.selected {
+  outline: 2px solid #f423fc;
+}
+
+.gray { background: #868484; }
+.blue { background: #2563eb; }
+.green-dark { background: #058f17; }
+.green-medium { background: #27a308; }
+.green-light { background: #22c55e; }
+.green-very-light { background: #86efac; }
+
+/* ===== TASK PANEL ===== */
+.task-panel {
+  min-width: 320px;
+}
+
+.task-panel h3 {
+  margin-bottom: 10px;
+}
+
+.task-form {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.task-form input[type="text"] {
+  flex: 1;
+}
+
+.task {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
