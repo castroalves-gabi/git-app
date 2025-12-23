@@ -1,67 +1,69 @@
+import React from "react";
 import DayCell from "./DayCell";
 
-const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const months = [
+  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+];
 
-export default function YearGrid({ year, tasks, selectedDate, onSelectDay }) {
-  const start = new Date(year, 0, 1);
-  const end = new Date(year, 11, 31);
+const weekDays = ["D", "S", "T", "Q", "Q", "S", "S"]; // Domingo a Sábado
 
+function YearGrid({ year, tasks, selectedDate, onSelectDay }) {
+  // Cria array de todos os dias do ano
   const days = [];
-  let current = new Date(start);
-  while (current <= end) {
-    days.push(new Date(current));
-    current.setDate(current.getDate() + 1);
+  const firstDayOfYear = new Date(year, 0, 1).getDay(); // 0 = domingo
+  const lastDay = new Date(year, 11, 31);
+
+  for (let d = new Date(year, 0, 1); d <= lastDay; d.setDate(d.getDate() + 1)) {
+    days.push(new Date(d));
   }
 
-  const firstDayOffset = start.getDay();
   const numRows = 7;
-  const totalCells = firstDayOffset + days.length;
-  const numCols = Math.ceil(totalCells / numRows);
+  const numCols = Math.ceil((days.length + firstDayOfYear) / 7);
 
-  const grid = Array.from({ length: numRows * numCols }, (_, index) => {
-    const row = index % numRows;
-    const col = Math.floor(index / numRows);
-    const dayIndex = col * numRows + row - firstDayOffset;
-    return dayIndex >= 0 && dayIndex < days.length ? days[dayIndex] : null;
+  // Cria grid de dias com possíveis células vazias
+  const grid = new Array(numCols * numRows).fill(null);
+  days.forEach((date, index) => {
+    const col = Math.floor((index + firstDayOfYear) / 7);
+    const row = (index + firstDayOfYear) % 7;
+    grid[col * numRows + row] = date;
   });
 
-  // labels dos meses
-  const monthLabels = {};
-  days.forEach((d, index) => {
-    if (d.getDate() === 1) {
-      const col = Math.floor((index + firstDayOffset) / 7);
-      monthLabels[col] = months[d.getMonth()];
+  // Função para pegar a primeira letra do mês se for o primeiro dia
+  const getMonthLetter = (date) => {
+    if (date.getDate() === 1) {
+      const month = months[date.getMonth()];
+      return month.slice(0, 3).charAt(0).toLowerCase() + month.slice(1, 3);
     }
-  });
+    return "";
+  };
 
   return (
     <div className="calendar-wrapper">
-      <div className="month-row">
-        {Array.from({ length: numCols }).map((_, i) => (
-          <div key={i} className="month-label">
-            {monthLabels[i] || ""}
-          </div>
-        ))}
-      </div>
-
       <div className="calendar-grid">
+        {/* Week labels */}
         <div className="week-labels">
-          {weekDays.map(d => <div key={d}>{d}</div>)}
+          {weekDays.map((d, i) => (
+            <div key={i}>{d}</div>
+          ))}
         </div>
 
+        {/* Grid de dias */}
         <div
           className="year-grid"
           style={{
             display: "grid",
-            gridTemplateRows: `repeat(${numRows}, 14px)`,
+            gridTemplateRows: `repeat(${numRows}, 20px)`,
             gridAutoFlow: "column",
-            gap: "3px"
+            gap: "3px",
           }}
         >
           {grid.map((date, i) => {
             if (!date) return <div key={i} />;
+
             const key = date.toISOString().slice(0, 10);
+            const monthLetter = getMonthLetter(date);
+
             return (
               <DayCell
                 key={key}
@@ -70,7 +72,9 @@ export default function YearGrid({ year, tasks, selectedDate, onSelectDay }) {
                 tasks={tasks[key] || []}
                 selected={selectedDate === key}
                 onClick={() => onSelectDay(key)}
-              />
+              >
+                {monthLetter}
+              </DayCell>
             );
           })}
         </div>
@@ -78,3 +82,5 @@ export default function YearGrid({ year, tasks, selectedDate, onSelectDay }) {
     </div>
   );
 }
+
+export default YearGrid;

@@ -33,12 +33,13 @@
 .month-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(14px, 14px));
+  margin-top: 18px;
   margin-left: 36px;
   height: 18px;
 }
 
 .month-label {
-  font-size: 10px;
+  font-size: 8px;
   color: #9ca3af;
   text-align: left;
 }
@@ -51,7 +52,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  font-size: 10px;
+  font-size: 8px;
   margin-right: 6px;
   color: #9ca3af;
 }
@@ -81,6 +82,15 @@
 .green-medium { background: #27a308; }
 .green-light { background: #22c55e; }
 .green-very-light { background: #86efac; }
+
+.gray:hover,
+.blue:hover,
+.green-dark:hover,
+.green-medium:hover,
+.green-light:hover,
+.green-very-light:hover {
+  filter: brightness(1.5);
+}
 
 /* ===== TASK PANEL ===== */
 .task-panel {
@@ -115,14 +125,104 @@
 }
 
 .logout-btn {
-  padding: 6px 10px;
-  background: #7f1d1d;
+  padding: 4px 8px;
+  background: #363333;
   color: #fef2f2;
   border: none;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 8px;
+  border-radius: 4px;
 }
 
 .logout-btn:hover {
-  background: #991b1b;
+    filter: brightness(1.5);
+}
+
+/* ===== RESPONSIVE STYLES ===== */
+
+/* Tablets e telas médias */
+@media (max-width: 1024px) {
+  .app-layout {
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .task-panel {
+    min-width: 260px;
+  }
+
+  .month-row {
+    margin-left: 28px;
+  }
+
+  .year-grid {
+    gap: 2px;
+  }
+
+  .day {
+    width: 13px;
+    height: 13px;
+  }
+}
+
+/* Tablets pequenos / celulares grandes */
+@media (max-width: 768px) {
+  .app-layout {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .year-selector {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .calendar-wrapper {
+    overflow-x: auto;
+    padding-bottom: 6px;
+  }
+
+  .month-row {
+    margin-left: 36px;
+  }
+
+  .task-panel {
+    min-width: unset;
+    width: 100%;
+  }
+}
+
+/* Celulares */
+@media (max-width: 480px) {
+  .app-layout {
+    padding: 12px;
+  }
+
+  .week-labels {
+    font-size: 7px;
+  }
+
+  .month-label {
+    font-size: 7px;
+  }
+
+  .day {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+  }
+
+  .year-grid {
+    gap: 2px;
+  }
+
+  .task-form {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .logout-btn {
+    width: 100%;
+  }
 }

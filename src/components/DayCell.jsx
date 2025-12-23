@@ -1,4 +1,4 @@
-export default function DayCell({ date, iso, tasks, selected, onClick }) {
+export default function DayCell({ date, iso, tasks, selected, onClick, children }) {
   const total = tasks.length;
   const done = tasks.filter(t => t.done).length;
 
@@ -24,6 +24,16 @@ export default function DayCell({ date, iso, tasks, selected, onClick }) {
       className={`${getColor()} ${selected ? "selected" : ""}`}
       title={title}
       onClick={onClick}
-    />
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: "20%",
+        cursor: "pointer",
+        color: "#03030373"
+      }}
+    >
+      {children}
+    </div>
   );
 }

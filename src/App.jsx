@@ -158,7 +158,7 @@ export default function App() {
   // -------------------------------
   return (
     <div className="app-layout">
-      <button
+      <button className="logout-btn"
         onClick={handleLogout}
         style={{ position: "absolute", top: 10, right: 10 }}
       >
