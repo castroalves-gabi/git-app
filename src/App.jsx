@@ -17,18 +17,22 @@ export default function App() {
   const [tasks, setTasks] = useState({});
   const [selectedDate, setSelectedDate] = useState(null);
   const [year, setYear] = useState(2025);
+  const [loading, setLoading] = useState(true);
 
   // -------------------------------
-  // 1) Checa usuário logado
+  // Sessão
   // -------------------------------
   useEffect(() => {
-    const session = supabase.auth.getSession().then(({ data }) => {
-      setUser(data.session?.user || null);
+    supabase.auth.getSession().then(({ data }) => {
+      setUser(data.session?.user ?? null);
+      setLoading(false);
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
-        setUser(session?.user || null);
+        setUser(session?.user ?? null);
+        setTasks({});
+        setSelectedDate(null);
       }
     );
 
@@ -36,61 +40,61 @@ export default function App() {
   }, []);
 
   // -------------------------------
-  // 2) Se não estiver logado → tela de login
+  // Carregar tasks
+  // -------------------------------
+  useEffect(() => {
+    if (!user) return;
+
+    loadTasks();
+  }, [user, year]);
+
+  async function loadTasks() {
+    const data = await getTasksByYear(year);
+    setTasks(data);
+  }
+
+  // -------------------------------
+  // Auth
   // -------------------------------
   async function handleLogin(e) {
     e.preventDefault();
+
     const email = e.target.email.value;
-    const pass = e.target.password.value;
+    const password = e.target.password.value;
 
     const { error } = await supabase.auth.signInWithPassword({
       email,
-      password: pass
+      password
     });
 
-    if (error) {
-      alert("Erro ao entrar: " + error.message);
-    }
+    if (error) alert(error.message);
   }
 
   async function handleRegister(e) {
     e.preventDefault();
+
     const email = e.target.email.value;
-    const pass = e.target.password.value;
+    const password = e.target.password.value;
 
     const { error } = await supabase.auth.signUp({
       email,
-      password: pass
+      password
     });
 
-    if (error) {
-      alert("Erro ao registrar: " + error.message);
-    } else {
-      alert("Conta criada! Agora faça login.");
-    }
+    if (error) alert(error.message);
+    else alert("Conta criada. Faça login.");
   }
 
   async function handleLogout() {
     await supabase.auth.signOut();
-    setTasks({});
-    setSelectedDate(null);
   }
 
   // -------------------------------
-  // 3) Carrega tasks do ano do usuário logado
+  // Tasks
   // -------------------------------
-  useEffect(() => {
-    if (user) loadTasks();
-  }, [year, user]);
-
-  async function loadTasks() {
+  async function handleAddTask(date, text) {
     if (!user) return;
 
-    const data = await getTasksByYear(year, user.id);
-    setTasks(data);
-  }
-
-  async function handleAddTask(date, text) {
     await addTask({
       user_id: user.id,
       date,
@@ -98,40 +102,49 @@ export default function App() {
       done: false,
       year
     });
+
     loadTasks();
   }
 
-  async function handleToggleTask(date, id, done) {
+  async function handleToggleTask(id, done) {
     await toggleTask(id, done);
     loadTasks();
   }
 
-  async function handleEditTask(date, id, text) {
+  async function handleEditTask(id, text) {
     await updateTask(id, text);
     loadTasks();
   }
 
-  async function handleDeleteTask(date, id) {
+  async function handleDeleteTask(id) {
     await deleteTask(id);
     loadTasks();
   }
 
   // -------------------------------
-  // 4) Tela de login/registro
+  // Loading
+  // -------------------------------
+  if (loading) {
+    return <div style={{ padding: 40 }}>Carregando…</div>;
+  }
+
+  // -------------------------------
+  // Login
   // -------------------------------
   if (!user) {
     return (
       <div style={{ padding: 40, maxWidth: 300, margin: "0 auto" }}>
         <h2>Entrar</h2>
 
-        <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <form onSubmit={handleLogin}>
           <input name="email" type="email" placeholder="Email" required />
           <input name="password" type="password" placeholder="Senha" required />
           <button type="submit">Login</button>
         </form>
 
-        <h3>Criar Conta</h3>
-        <form onSubmit={handleRegister} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <h3>Criar conta</h3>
+
+        <form onSubmit={handleRegister}>
           <input name="email" type="email" placeholder="Email" required />
           <input name="password" type="password" placeholder="Senha" required />
           <button type="submit">Registrar</button>
@@ -141,27 +154,25 @@ export default function App() {
   }
 
   // -------------------------------
-  // 5) Tela principal (usuário logado)
+  // App
   // -------------------------------
   return (
     <div className="app-layout">
+      <button
+        onClick={handleLogout}
+        style={{ position: "absolute", top: 10, right: 10 }}
+      >
+        Sair
+      </button>
 
-      {/* Botão de Logout */}
-      <div style={{ position: "absolute", top: 10, right: 10 }}>
-        <button onClick={handleLogout}>Sair</button>
-      </div>
-
-      {/* Seletor de Ano */}
       <YearSelector year={year} setYear={setYear} />
 
-      {/* Calendário */}
       <YearGrid
         year={year}
         tasks={tasks}
         onSelectDay={setSelectedDate}
       />
 
-      {/* Painel de Tarefas do Dia */}
       {selectedDate && (
         <TaskPanel
           date={selectedDate}

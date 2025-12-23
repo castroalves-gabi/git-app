@@ -45,20 +45,19 @@ export default function TaskPanel({
           <input
             type="checkbox"
             checked={task.done}
-            onChange={() =>
-              toggleTask(date, task.id, !task.done)
-            }
+            onChange={() => toggleTask(task.id, !task.done)}
+
           />
 
           <input
             type="text"
             value={task.text}
             onChange={(e) =>
-              editTask(date, task.id, e.target.value)
+              editTask(task.id, e.target.value)
             }
           />
 
-          <button onClick={() => deleteTask(date, task.id)}>
+          <button onClick={() => deleteTask(task.id)}>
             ✕
           </button>
         </div>

@@ -1,10 +1,13 @@
 import { supabase } from "../supabase";
 
 export async function getTasksByYear(year) {
+  const user = (await supabase.auth.getUser()).data.user;
+
   const { data, error } = await supabase
     .from("tasks")
     .select("*")
-    .eq("year", year);
+    .eq("year", year)
+    .eq("user_id", user.id); // filtra pelo usuário logado
 
   if (error) throw error;
 
@@ -29,28 +32,37 @@ export async function addTask(task) {
 }
 
 export async function toggleTask(id, done) {
-  const { error } = await supabase
-    .from("tasks")
-    .update({ done })
-    .eq("id", id);
+    const user = (await supabase.auth.getUser()).data.user;
+
+    const { error } = await supabase
+        .from("tasks")
+        .update({ done })
+        .eq("id", id)
+        .eq("user_id", user.id); // garante que o usuário só possa modificar suas próprias tarefas
 
   if (error) throw error;
 }
 
 export async function updateTask(id, text) {
-  const { error } = await supabase
-    .from("tasks")
-    .update({ text })
-    .eq("id", id);
+    const user = (await supabase.auth.getUser()).data.user;
 
-  if (error) throw error;
+    const { error } = await supabase
+        .from("tasks")
+        .update({ text })
+        .eq("id", id)
+        .eq("user_id", user.id); // garante que o usuário só possa modificar suas próprias tarefas
+
+    if (error) throw error;
 }
 
 export async function deleteTask(id) {
-  const { error } = await supabase
+    const user = (await supabase.auth.getUser()).data.user;
+
+    const { error } = await supabase
     .from("tasks")
     .delete()
-    .eq("id", id);
+    .eq("id", id)
+    .eq("user_id", user.id); // garante que o usuário só possa deletar suas próprias tarefas    
 
-  if (error) throw error;
+    if (error) throw error;
 }
