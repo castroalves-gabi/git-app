@@ -9,33 +9,36 @@ export default function YearGrid({ year, tasks, selectedDate, onSelectDay }) {
 
   const days = [];
   let current = new Date(start);
-
   while (current <= end) {
     days.push(new Date(current));
     current.setDate(current.getDate() + 1);
   }
 
   const firstDayOffset = start.getDay();
+  const numRows = 7;
   const totalCells = firstDayOffset + days.length;
-  const weeks = Math.ceil(totalCells / 7);
+  const numCols = Math.ceil(totalCells / numRows);
 
-  const grid = Array.from({ length: weeks * 7 }, (_, i) => {
-    const dayIndex = i - firstDayOffset;
+  const grid = Array.from({ length: numRows * numCols }, (_, index) => {
+    const row = index % numRows;
+    const col = Math.floor(index / numRows);
+    const dayIndex = col * numRows + row - firstDayOffset;
     return dayIndex >= 0 && dayIndex < days.length ? days[dayIndex] : null;
   });
 
+  // labels dos meses
   const monthLabels = {};
-  days.forEach(d => {
+  days.forEach((d, index) => {
     if (d.getDate() === 1) {
-      const weekIndex = Math.floor((firstDayOffset + days.indexOf(d)) / 7);
-      monthLabels[weekIndex] = months[d.getMonth()];
+      const col = Math.floor((index + firstDayOffset) / 7);
+      monthLabels[col] = months[d.getMonth()];
     }
   });
 
   return (
     <div className="calendar-wrapper">
       <div className="month-row">
-        {Array.from({ length: weeks }).map((_, i) => (
+        {Array.from({ length: numCols }).map((_, i) => (
           <div key={i} className="month-label">
             {monthLabels[i] || ""}
           </div>
@@ -47,12 +50,18 @@ export default function YearGrid({ year, tasks, selectedDate, onSelectDay }) {
           {weekDays.map(d => <div key={d}>{d}</div>)}
         </div>
 
-        <div className="year-grid">
+        <div
+          className="year-grid"
+          style={{
+            display: "grid",
+            gridTemplateRows: `repeat(${numRows}, 14px)`,
+            gridAutoFlow: "column",
+            gap: "3px"
+          }}
+        >
           {grid.map((date, i) => {
             if (!date) return <div key={i} />;
-
             const key = date.toISOString().slice(0, 10);
-
             return (
               <DayCell
                 key={key}
