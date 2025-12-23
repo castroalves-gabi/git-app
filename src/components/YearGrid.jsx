@@ -52,10 +52,8 @@ function YearGrid({ year, tasks, selectedDate, onSelectDay }) {
         <div
           className="year-grid"
           style={{
-            display: "grid",
-            gridTemplateRows: `repeat(${numRows}, 20px)`,
+            gridTemplateRows: `repeat(${numRows}, 15px)`,
             gridAutoFlow: "column",
-            gap: "3px",
           }}
         >
           {grid.map((date, i) => {

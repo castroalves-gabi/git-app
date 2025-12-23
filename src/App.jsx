@@ -18,10 +18,8 @@ export default function App() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [year, setYear] = useState(2025);
   const [loading, setLoading] = useState(true);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
-  // -------------------------------
-  // Sessão
-  // -------------------------------
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       setUser(data.session?.user ?? null);
@@ -39,12 +37,8 @@ export default function App() {
     return () => listener.subscription.unsubscribe();
   }, []);
 
-  // -------------------------------
-  // Carregar tasks
-  // -------------------------------
   useEffect(() => {
     if (!user) return;
-
     loadTasks();
   }, [user, year]);
 
@@ -53,9 +47,6 @@ export default function App() {
     setTasks(data);
   }
 
-  // -------------------------------
-  // Auth
-  // -------------------------------
   async function handleLogin(e) {
     e.preventDefault();
 
@@ -85,13 +76,19 @@ export default function App() {
     else alert("Conta criada. Faça login.");
   }
 
-  async function handleLogout() {
+  function handleLogoutClick() {
+    setShowLogoutConfirm(true);
+  }
+
+  function cancelLogout() {
+    setShowLogoutConfirm(false);
+  }
+
+  async function confirmLogout() {
+    setShowLogoutConfirm(false);
     await supabase.auth.signOut();
   }
 
-  // -------------------------------
-  // Tasks
-  // -------------------------------
   async function handleAddTask(date, text) {
     if (!user) return;
 
@@ -121,16 +118,10 @@ export default function App() {
     loadTasks();
   }
 
-  // -------------------------------
-  // Loading
-  // -------------------------------
   if (loading) {
     return <div style={{ padding: 40 }}>Carregando…</div>;
   }
 
-  // -------------------------------
-  // Login
-  // -------------------------------
   if (!user) {
     return (
       <div style={{ padding: 40, maxWidth: 300, margin: "0 auto" }}>
@@ -153,36 +144,55 @@ export default function App() {
     );
   }
 
-  // -------------------------------
-  // App
-  // -------------------------------
   return (
-    <div className="app-layout">
-      <button className="logout-btn"
-        onClick={handleLogout}
-        style={{ position: "absolute", top: 10, right: 10 }}
-      >
-        Sair
-      </button>
+    <>
+      <div className="top">
+        <span className="top-text">Git Tasks</span>
 
-      <YearSelector year={year} setYear={setYear} />
+        <button className="logout-btn" onClick={handleLogoutClick}>
+          Sair
+        </button>
+      </div>
 
-      <YearGrid
-        year={year}
-        tasks={tasks}
-        onSelectDay={setSelectedDate}
-      />
+      <div className="app-layout">
+        <YearSelector year={year} setYear={setYear} />
 
-      {selectedDate && (
-        <TaskPanel
-          date={selectedDate}
-          tasks={tasks[selectedDate] || []}
-          addTask={handleAddTask}
-          toggleTask={handleToggleTask}
-          editTask={handleEditTask}
-          deleteTask={handleDeleteTask}
-        />
+        <div className="calendar-column">
+          <YearGrid
+            year={year}
+            tasks={tasks}
+            onSelectDay={setSelectedDate}
+          />
+
+          {selectedDate && (
+            <TaskPanel
+              date={selectedDate}
+              tasks={tasks[selectedDate] || []}
+              addTask={handleAddTask}
+              toggleTask={handleToggleTask}
+              editTask={handleEditTask}
+              deleteTask={handleDeleteTask}
+            />
+          )}
+        </div>
+      </div>
+
+      {showLogoutConfirm && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <p>Deseja sair?</p>
+
+            <div className="modal-actions">
+              <button className="cancel" onClick={cancelLogout}>
+                Cancelar
+              </button>
+              <button className="confirm" onClick={confirmLogout}>
+                Sair
+              </button>
+            </div>
+          </div>
+        </div>
       )}
-    </div>
+    </>
   );
 }
